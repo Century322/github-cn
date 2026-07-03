@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TrendingUp, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { TrendingUp, Loader2, ArrowRight } from "lucide-react";
 import { POPULAR_LANGUAGES, TRENDING_SINCE_OPTIONS } from "@github-cn/shared";
 import type { TrendingRepo } from "@github-cn/shared";
 import RepoCard from "@/components/repo/RepoCard";
@@ -31,6 +32,9 @@ function trendingToRepo(t: TrendingRepo): GitHubRepo {
     subscribers_count: 0,
     archived: false,
     disabled: false,
+    homepage: null,
+    private: false,
+    parent: null,
   };
 }
 
@@ -88,11 +92,13 @@ export default function TrendingSection() {
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
+            aria-label="编程语言筛选"
             className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
+            <option value="All">全部语言</option>
             {POPULAR_LANGUAGES.map((lang) => (
               <option key={lang} value={lang}>
-                {lang === "All" ? "全部语言" : lang}
+                {lang}
               </option>
             ))}
           </select>
@@ -101,7 +107,7 @@ export default function TrendingSection() {
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[...Array(6)].map((_, idx) => (
+          {[...Array(9)].map((_, idx) => (
             <div key={idx} className="bg-white rounded-2xl border border-slate-100 p-4 shadow-2xs space-y-4">
               <div className="flex gap-3">
                 <div className="w-10 h-10 skeleton-shimmer rounded-xl" />
@@ -129,6 +135,13 @@ export default function TrendingSection() {
           ))}
         </div>
       )}
+
+      <div className="mt-6 text-center">
+        <Link href="/search?sort=stars&order=desc"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 transition-colors">
+          查看更多热门项目 <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
     </section>
   );
 }

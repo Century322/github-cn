@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developers.vercel.com/platform/nextjs",
+  "framework": "nextjs",
+  "buildCommand": "cd ../shared && pnpm build && cd ../frontend && pnpm build",
+  "outputDirectory": ".next",
+  "installCommand": "pnpm install",
+  "env": {
+    "BACKEND_URL": "https://github-cn-api.onrender.com"
+  }
+}

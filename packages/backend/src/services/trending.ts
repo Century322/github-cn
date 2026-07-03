@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { getWithCache, CACHE_TTL } from "./cache.js";
+import { githubService } from "./github.js";
 import type { TrendingRepo } from "@github-cn/shared";
 
 export async function fetchTrending(language: string = "", since: string = "daily"): Promise<TrendingRepo[]> {
@@ -31,23 +32,17 @@ export async function fetchTrending(language: string = "", since: string = "dail
       const owner = parts[0] || "";
       const name = parts[1] || "";
 
-      const description = $el.find("p.col-9").text().trim() || null;
+      const description = $el.find("p").first().text().trim() || null;
 
       const $lang = $el.find('[itemprop="programmingLanguage"]');
-      const language = $lang.text().trim() || null;
+      const langText = $lang.text().trim() || null;
 
-      const starsText = $el.find('.Link--muted.d-inline-block.mr-3 svg.octicon-star')
-        .closest("a")
-        .text()
-        .trim()
-        .replace(/,/g, "");
+      const $starLink = $el.find('a:has(svg.octicon-star)');
+      const starsText = $starLink.text().trim().replace(/,/g, "");
       const stars = parseInt(starsText, 10) || 0;
 
-      const forksText = $el.find('.Link--muted.d-inline-block svg.octicon-repo-forked')
-        .closest("a")
-        .text()
-        .trim()
-        .replace(/,/g, "");
+      const $forkLink = $el.find('a:has(svg.octicon-repo-forked)');
+      const forksText = $forkLink.text().trim().replace(/,/g, "");
       const forks = parseInt(forksText, 10) || 0;
 
       const todayStarsText = $el.find(".float-sm-right").text().trim();
@@ -59,7 +54,7 @@ export async function fetchTrending(language: string = "", since: string = "dail
           full_name: `${owner}/${name}`,
           name,
           description,
-          language,
+          language: langText,
           stars,
           forks,
           today_stars: todayStars,
@@ -71,6 +66,28 @@ export async function fetchTrending(language: string = "", since: string = "dail
         });
       }
     });
+
+    // 如果爬虫获取的 star/fork 数据为 0，用 GitHub API 补全
+    const needsEnrichment = repos.filter((r) => r.stars === 0);
+    if (needsEnrichment.length > 0) {
+      const batchSize = 5;
+      for (let i = 0; i < needsEnrichment.length; i += batchSize) {
+        const batch = needsEnrichment.slice(i, i + batchSize);
+        const results = await Promise.allSettled(
+          batch.map((r) => githubService.getRepo(r.full_name.split("/")[0], r.full_name.split("/")[1]))
+        );
+        results.forEach((result, idx) => {
+          if (result.status === "fulfilled" && result.value) {
+            const repo = batch[idx];
+            const apiData = result.value;
+            repo.stars = apiData.stargazers_count || repo.stars;
+            repo.forks = apiData.forks_count || repo.forks;
+            repo.description = repo.description || apiData.description;
+            repo.language = repo.language || apiData.language;
+          }
+        });
+      }
+    }
 
     return repos;
   });

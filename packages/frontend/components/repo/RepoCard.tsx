@@ -3,6 +3,7 @@ import { Star, GitFork } from "lucide-react";
 import { LANGUAGE_COLORS } from "@github-cn/shared";
 import { formatNumber, formatDate } from "@github-cn/shared";
 import type { GitHubRepo } from "@github-cn/shared";
+import { proxyAvatar } from "@/lib/api";
 
 interface RepoCardProps {
   repo: GitHubRepo;
@@ -16,7 +17,7 @@ export default function RepoCard({ repo }: RepoCardProps) {
       <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-xs hover:shadow-lg hover:border-blue-100 transition-all duration-300 cursor-pointer flex flex-col h-full">
         <div className="flex items-start gap-3 mb-3">
           <img
-            src={repo.owner.avatar_url}
+            src={proxyAvatar(repo.owner.avatar_url)}
             alt={repo.owner.login}
             className="w-10 h-10 rounded-xl border border-slate-100"
           />

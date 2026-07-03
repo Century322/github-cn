@@ -7,6 +7,7 @@ export const LANGUAGE_COLORS: Record<string, string> = {
   Java: "#b07219",
   "C++": "#f34b7d",
   C: "#555555",
+  "C#": "#178600",
   Ruby: "#701516",
   PHP: "#4F5D95",
   Swift: "#F05138",
@@ -24,6 +25,7 @@ export const LANGUAGE_COLORS: Record<string, string> = {
   HTML: "#e34c26",
   CSS: "#563d7c",
   SCSS: "#c6538c",
+  "Objective-C": "#438eff",
   "Jupyter Notebook": "#DA5B0B",
   TeX: "#3D6117",
   Makefile: "#427819",
@@ -31,7 +33,6 @@ export const LANGUAGE_COLORS: Record<string, string> = {
 };
 
 export const POPULAR_LANGUAGES = [
-  "All",
   "JavaScript",
   "TypeScript",
   "Python",
@@ -40,6 +41,7 @@ export const POPULAR_LANGUAGES = [
   "Java",
   "C++",
   "C",
+  "C#",
   "Ruby",
   "PHP",
   "Swift",
@@ -49,6 +51,8 @@ export const POPULAR_LANGUAGES = [
   "Vue",
   "HTML",
   "CSS",
+  "Scala",
+  "R",
 ];
 
 export const TRENDING_SINCE_OPTIONS = [

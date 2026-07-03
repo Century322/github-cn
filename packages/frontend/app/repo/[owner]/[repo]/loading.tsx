@@ -16,10 +16,10 @@ export default function RepoLoading() {
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-7">
-          <div className="bg-white rounded-3xl border border-slate-100 p-6 h-96 skeleton-shimmer" />
+        <div className="lg:col-span-8">
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 h-96 skeleton-shimmer" />
         </div>
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-4 space-y-6">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="bg-white rounded-3xl border border-slate-100 p-5 h-32 skeleton-shimmer" />
           ))}

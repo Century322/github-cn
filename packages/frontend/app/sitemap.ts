@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+const API_BASE = process.env.BACKEND_URL || "http://localhost:3001";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -8,9 +10,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1,
     },
+    {
+      url: "https://github-cn.dev/search",
+      lastModified: new Date(),
+      changeFrequency: "always",
+      priority: 0.9,
+    },
   ];
 
-  // In production, this would fetch trending repos from the database
-  // For now, return static pages only
+  try {
+    const res = await fetch(`${API_BASE}/api/trending?since=daily`, {
+      next: { revalidate: 3600 },
+    });
+    if (res.ok) {
+      const repos: { full_name: string; html_url: string }[] = await res.json();
+      const repoPages: MetadataRoute.Sitemap = repos.slice(0, 50).map((repo) => ({
+        url: `https://github-cn.dev/repo/${repo.full_name}`,
+        lastModified: new Date(),
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+      }));
+      return [...staticPages, ...repoPages];
+    }
+  } catch {
+    // fallback to static only
+  }
+
   return staticPages;
 }

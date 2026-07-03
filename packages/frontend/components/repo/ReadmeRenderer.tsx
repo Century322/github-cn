@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github.css";
+import { proxyRawUrl } from "@/lib/api";
 
 interface ReadmeRendererProps {
   content: string;
@@ -15,6 +16,16 @@ interface ReadmeRendererProps {
 export default function ReadmeRenderer({ content, owner, repo, branch }: ReadmeRendererProps) {
   const baseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}`;
 
+  function resolveUrl(raw: string): string {
+    if (!raw) return raw;
+    if (raw.startsWith("http") || raw.startsWith("mailto:") || raw.startsWith("#")) return raw;
+    try {
+      return new URL(raw, baseUrl + "/").href;
+    } catch {
+      return raw.startsWith("/") ? `${baseUrl}${raw}` : `${baseUrl}/${raw}`;
+    }
+  }
+
   return (
     <div className="prose prose-slate prose-sm max-w-none">
       <ReactMarkdown
@@ -22,11 +33,10 @@ export default function ReadmeRenderer({ content, owner, repo, branch }: ReadmeR
         rehypePlugins={[rehypeHighlight]}
         components={{
           img: ({ src, alt, ...props }) => {
-            const srcStr = typeof src === "string" ? src : "";
-            const resolvedSrc = srcStr.startsWith("http") ? srcStr : `${baseUrl}/${srcStr.replace(/^\.\//, "")}`;
+            const resolvedSrc = resolveUrl(typeof src === "string" ? src : "");
             return (
               <img
-                src={resolvedSrc}
+                src={proxyRawUrl(resolvedSrc)}
                 alt={alt || ""}
                 loading="lazy"
                 className="max-w-full rounded-lg"
@@ -36,12 +46,12 @@ export default function ReadmeRenderer({ content, owner, repo, branch }: ReadmeR
           },
           a: ({ href, children, ...props }) => {
             const hrefStr = typeof href === "string" ? href : "";
-            const resolvedHref = hrefStr.startsWith("http") ? hrefStr : `${baseUrl}/${hrefStr.replace(/^\.\//, "")}`;
+            const resolvedHref = resolveUrl(hrefStr);
+            const isAnchor = hrefStr.startsWith("#");
             return (
               <a
                 href={resolvedHref}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...(isAnchor ? {} : { target: "_blank", rel: "noopener noreferrer" })}
                 {...props}
               >
                 {children}

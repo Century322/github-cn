@@ -1,16 +1,36 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
 
-export async function fetchAPI<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: "请求失败" }));
-    throw new Error(error.error || `HTTP ${res.status}`);
+function getApiBase(): string {
+  if (typeof window !== "undefined") {
+    return "";
   }
-  return res.json();
+  return BACKEND_URL;
+}
+
+export async function fetchJSON<T>(path: string, revalidate = 1800): Promise<T | null> {
+  try {
+    const base = getApiBase();
+    const url = `${base}${path}`;
+    const res = await fetch(url, { next: { revalidate } });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export function proxyAvatar(url: string): string {
+  if (!url) return "";
+  if (url.includes("avatars.githubusercontent.com")) {
+    return `/api/proxy/avatar?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+}
+
+export function proxyRawUrl(url: string): string {
+  if (!url) return "";
+  if (url.includes("raw.githubusercontent.com")) {
+    return `/api/proxy/raw?url=${encodeURIComponent(url)}`;
+  }
+  return url;
 }

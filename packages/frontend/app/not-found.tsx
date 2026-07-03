@@ -1,20 +1,16 @@
-"use client";
-
-import { SearchX } from "lucide-react";
 import Link from "next/link";
+import SearchBox from "@/components/search/SearchBox";
 
 export default function NotFound() {
   return (
-    <div className="max-w-lg mx-auto text-center py-20 px-4">
-      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 mx-auto mb-4">
-        <SearchX className="w-8 h-8" />
+    <div className="max-w-2xl mx-auto text-center py-20 px-4">
+      <div className="text-8xl font-display font-bold text-slate-100 mb-4">404</div>
+      <h2 className="font-display font-bold text-2xl text-slate-800 mb-2">页面不存在</h2>
+      <p className="text-sm text-slate-500 mb-8">你访问的页面可能已被删除或地址输入有误</p>
+      <div className="max-w-md mx-auto mb-6">
+        <SearchBox />
       </div>
-      <h2 className="font-display font-bold text-2xl text-slate-800 mb-2">页面未找到</h2>
-      <p className="text-sm text-slate-500 mb-6">你访问的页面不存在</p>
-      <Link
-        href="/"
-        className="inline-flex px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors"
-      >
+      <Link href="/" className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-500 transition-colors inline-block">
         返回首页
       </Link>
     </div>

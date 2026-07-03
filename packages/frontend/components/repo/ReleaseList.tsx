@@ -1,12 +1,44 @@
-import { Tag, Download, ExternalLink } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Tag, Download, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { formatDate, formatFileSize } from "@github-cn/shared";
 import type { GitHubRelease } from "@github-cn/shared";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ReleaseListProps {
   releases: GitHubRelease[];
+  repoFullName?: string;
 }
 
-export default function ReleaseList({ releases }: ReleaseListProps) {
+function trackDownload(repoFullName: string, downloadType: string) {
+  fetch("/api/download", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ repo_full_name: repoFullName, download_type: downloadType }),
+  }).catch(() => {});
+}
+
+function ReleaseBody({ body }: { body: string }) {
+  const [expanded, setExpanded] = useState(false);
+  if (!body) return null;
+  const shouldTruncate = body.length > 500;
+  return (
+    <div className="mt-3">
+      <div className={`prose prose-slate prose-sm max-w-none text-xs ${!expanded && shouldTruncate ? "line-clamp-4" : ""}`}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{expanded || !shouldTruncate ? body : body.slice(0, 500) + "..."}</ReactMarkdown>
+      </div>
+      {shouldTruncate && (
+        <button onClick={() => setExpanded(!expanded)} className="mt-1 text-xs text-blue-600 hover:underline flex items-center gap-1">
+          {expanded ? <><ChevronUp className="w-3 h-3" /> 收起</> : <><ChevronDown className="w-3 h-3" /> 展开全文</>}
+        </button>
+      )}
+    </div>
+  );
+}
+
+export default function ReleaseList({ releases, repoFullName }: ReleaseListProps) {
   if (releases.length === 0) {
     return (
       <div className="text-center py-6">
@@ -49,12 +81,15 @@ export default function ReleaseList({ releases }: ReleaseListProps) {
             </a>
           </div>
 
+          <ReleaseBody body={release.body || ""} />
+
           {release.assets.length > 0 && (
             <div className="mt-3 space-y-1.5">
               {release.assets.slice(0, 5).map((asset) => (
                 <a
                   key={asset.id}
                   href={asset.browser_download_url}
+                  onClick={() => repoFullName && trackDownload(repoFullName, `release-${asset.name}`)}
                   className="flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-600 transition-colors group"
                 >
                   <Download className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500" />
@@ -64,6 +99,44 @@ export default function ReleaseList({ releases }: ReleaseListProps) {
                   </span>
                 </a>
               ))}
+              <div className="flex gap-2 pt-1">
+                <a
+                  href={release.zipball_url}
+                  onClick={() => repoFullName && trackDownload(repoFullName, "release-source-zip")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-500 transition-colors"
+                >
+                  <Download className="w-3 h-3" />
+                  Source code (zip)
+                </a>
+                <a
+                  href={release.tarball_url}
+                  onClick={() => repoFullName && trackDownload(repoFullName, "release-source-tar.gz")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-500 transition-colors"
+                >
+                  <Download className="w-3 h-3" />
+                  Source code (tar.gz)
+                </a>
+              </div>
+            </div>
+          )}
+          {release.assets.length === 0 && (
+            <div className="mt-3 flex gap-2">
+              <a
+                href={release.zipball_url}
+                onClick={() => repoFullName && trackDownload(repoFullName, "release-source-zip")}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-500 transition-colors"
+              >
+                <Download className="w-3 h-3" />
+                Source code (zip)
+              </a>
+              <a
+                href={release.tarball_url}
+                onClick={() => repoFullName && trackDownload(repoFullName, "release-source-tar.gz")}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-100 rounded-lg text-xs text-slate-500 transition-colors"
+              >
+                <Download className="w-3 h-3" />
+                Source code (tar.gz)
+              </a>
             </div>
           )}
         </div>

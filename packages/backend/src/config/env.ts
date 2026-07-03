@@ -28,4 +28,14 @@ export const GITHUB_TOKENS = (process.env.GITHUB_TOKENS || "")
   .map((t) => t.trim())
   .filter(Boolean);
 export const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
+export const DATABASE_URL = process.env.DATABASE_URL || "";
+export const REDIS_URL = process.env.REDIS_URL || "";
+export const JWT_SECRET = process.env.JWT_SECRET || "";
+
+if (!ADMIN_PASSWORD) {
+  console.warn("⚠️ ADMIN_PASSWORD not set - admin endpoints will be inaccessible");
+}
+if (!JWT_SECRET) {
+  console.warn("⚠️ JWT_SECRET not set - using default, please set in production");
+}

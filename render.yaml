@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: github-cn-api
+    runtime: node
+    plan: free
+    buildCommand: cd packages/shared && npm run build && cd ../../packages/backend && npm run build
+    startCommand: cd packages/backend && node dist/server.cjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: GITHUB_TOKENS
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: github-cn-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: github-cn-redis
+          property: connectionString
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false
+
+  - type: redis
+    name: github-cn-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  - name: github-cn-db
+    plan: free
