@@ -16,6 +16,9 @@ export function getPool(): pg.Pool {
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
+      ssl: DATABASE_URL.includes("render.com") || DATABASE_URL.includes("neon.tech")
+        ? { rejectUnauthorized: false }
+        : undefined,
     });
     pool.on("error", (err) => {
       console.error("PostgreSQL pool error:", err.message);

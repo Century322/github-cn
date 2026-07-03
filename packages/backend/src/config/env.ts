@@ -27,7 +27,11 @@ export const GITHUB_TOKENS = (process.env.GITHUB_TOKENS || "")
   .split(",")
   .map((t) => t.trim())
   .filter(Boolean);
-export const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
+export const CORS_ORIGIN: string | string[] = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.includes(",")
+    ? process.env.CORS_ORIGIN.split(",").map(s => s.trim())
+    : process.env.CORS_ORIGIN
+  : "http://localhost:3000";
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 export const DATABASE_URL = process.env.DATABASE_URL || "";
 export const REDIS_URL = process.env.REDIS_URL || "";

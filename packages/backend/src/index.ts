@@ -24,7 +24,7 @@ app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
 }));
-app.use(cors({ origin: CORS_ORIGIN }));
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
