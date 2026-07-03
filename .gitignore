@@ -1,5 +1,4 @@
 node_modules/
-dist/
 .next/
 .env
 .env.local
@@ -8,3 +7,13 @@ dist/
 .trae/
 .vercel
 .env*
+packages/frontend/
+packages/shared/
+packages/backend/src/
+packages/backend/package.json
+packages/backend/tsconfig.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+watch.json
+glitch-start.js
+package.glitch.json
