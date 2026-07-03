@@ -1,0 +1,11 @@
+{
+  "install": {
+    "include": ["^package\\.json$", "^pnpm-lock\\.yaml$", "^pnpm-workspace\\.yaml$", "^packages/shared/package\\.json$", "^packages/backend/package\\.json$"]
+  },
+  "restart": {
+    "exclude": ["^node_modules/", "^\\.data/", "^packages/backend/dist/"],
+    "include": ["^packages/backend/src/", "^packages/shared/src/", "^watch\\.json$"]
+  },
+  "build": "npm install -g pnpm@9 && pnpm install && pnpm --filter shared build && pnpm --filter backend build",
+  "start": "node packages/backend/dist/server.cjs"
+}

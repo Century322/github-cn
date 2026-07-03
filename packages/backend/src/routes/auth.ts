@@ -310,7 +310,7 @@ router.post("/favorites", async (req, res) => {
 });
 
 // DELETE /api/auth/favorites/:repoFullName
-router.delete<{ repoFullName: string }>("/favorites/{repoFullName}", async (req, res) => {
+router.delete<{ repoFullName: string }>("/favorites/:repoFullName", async (req, res) => {
   const userId = getUserFromRequest(req);
   if (!userId) {
     res.status(401).json({ error: "未登录" });
